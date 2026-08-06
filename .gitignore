@@ -1,5 +1,11 @@
 node_modules/
 data/
+
+# This is a Bun app. An npm lockfile here breaks the Docker build: Bun migrates
+# it, counts that as a change, and CI installs are frozen-lockfile.
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
 *.db
 *.db-wal
 *.db-shm
