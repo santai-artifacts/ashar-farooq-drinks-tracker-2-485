@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Sip — Drinks Tracker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0f172a;
+    --surface: #1e293b;
+    --surface-2: #334155;
+    --line: #33415580;
+    --text: #f1f5f9;
+    --muted: #94a3b8;
+    --accent: #38bdf8;
+    --accent-deep: #0ea5e9;
+    --goal: 2000;
+    --radius: 18px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    background: radial-gradient(1200px 600px at 50% -10%, #1e3a5f 0%, var(--bg) 55%);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    padding: 32px 20px 64px;
+  }
+  .app { width: 100%; max-width: 460px; }
+
+  header { text-align: center; margin-bottom: 28px; }
+  header h1 {
+    font-size: 1.6rem; font-weight: 800; letter-spacing: -0.02em;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+  }
+  header p { color: var(--muted); font-size: 0.9rem; margin-top: 4px; }
+
+  /* Progress ring */
+  .ring-wrap { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; }
+  .ring { position: relative; width: 200px; height: 200px; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .track { stroke: var(--surface-2); }
+  .ring .fill {
+    stroke: url(#grad); stroke-linecap: round;
+    transition: stroke-dashoffset 0.7s cubic-bezier(.22,1,.36,1);
+  }
+  .ring .center {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+  }
+  .ring .total { font-size: 2.4rem; font-weight: 800; letter-spacing: -0.03em; line-height: 1; }
+  .ring .unit { color: var(--muted); font-size: 0.85rem; margin-top: 6px; }
+  .ring .goal { color: var(--muted); font-size: 0.8rem; margin-top: 2px; }
+
+  /* Quick add buttons */
+  .quick { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 14px; }
+  .quick button {
+    background: var(--surface); border: 1px solid var(--line); color: var(--text);
+    border-radius: var(--radius); padding: 14px 6px; cursor: pointer;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    font-family: inherit; font-size: 0.72rem; font-weight: 600;
+    transition: transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .quick button .emoji { font-size: 1.4rem; }
+  .quick button .ml { color: var(--muted); font-weight: 500; }
+  .quick button:hover { transform: translateY(-2px); border-color: var(--accent); background: var(--surface-2); }
+  .quick button:active { transform: translateY(0) scale(.97); }
+
+  /* Custom add */
+  .custom { display: flex; gap: 10px; margin-bottom: 28px; }
+  .custom input {
+    flex: 1; background: var(--surface); border: 1px solid var(--line); color: var(--text);
+    border-radius: 12px; padding: 12px 14px; font-family: inherit; font-size: 0.9rem;
+  }
+  .custom input:focus { outline: none; border-color: var(--accent); }
+  .custom button {
+    background: var(--accent-deep); color: #041016; border: none; border-radius: 12px;
+    padding: 0 18px; font-family: inherit; font-weight: 700; font-size: 0.9rem; cursor: pointer;
+    transition: filter .12s ease;
+  }
+  .custom button:hover { filter: brightness(1.1); }
+
+  /* Log */
+  .log h2 { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); margin-bottom: 12px; }
+  ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+  li {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--line);
+    border-radius: 14px; padding: 12px 14px;
+    animation: pop .25s ease;
+  }
+  @keyframes pop { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: none; } }
+  li .li-emoji { font-size: 1.3rem; }
+  li .li-info { flex: 1; }
+  li .li-kind { font-weight: 600; font-size: 0.92rem; }
+  li .li-time { color: var(--muted); font-size: 0.75rem; }
+  li .li-amount { font-weight: 700; color: var(--accent); font-size: 0.9rem; }
+  li .li-del {
+    background: none; border: none; color: var(--muted); cursor: pointer;
+    font-size: 1.1rem; line-height: 1; padding: 4px; border-radius: 8px; transition: color .12s, background .12s;
+  }
+  li .li-del:hover { color: #f87171; background: #f8717120; }
+
+  .empty { text-align: center; color: var(--muted); font-size: 0.9rem; padding: 28px 0; }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <h1>💧 Sip</h1>
+    <p>Stay hydrated — track today's drinks</p>
+  </header>
+
+  <div class="ring-wrap">
+    <div class="ring">
+      <svg width="200" height="200" viewBox="0 0 200 200">
+        <defs>
+          <linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#38bdf8" />
+            <stop offset="100%" stop-color="#818cf8" />
+          </linearGradient>
+        </defs>
+        <circle class="track" cx="100" cy="100" r="86" fill="none" stroke-width="16" />
+        <circle class="fill" id="ringFill" cx="100" cy="100" r="86" fill="none" stroke-width="16"
+                stroke-dasharray="540.35" stroke-dashoffset="540.35" />
+      </svg>
+      <div class="center">
+        <div class="total" id="total">0</div>
+        <div class="unit">ml today</div>
+        <div class="goal" id="goalLabel">of 2000 ml goal</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="quick" id="quick"></div>
+
+  <div class="custom">
+    <input id="customName" type="text" placeholder="Drink name" aria-label="Drink name" />
+    <input id="customMl" type="number" min="1" placeholder="ml" aria-label="Amount in ml" style="max-width:80px" />
+    <button id="addCustom">Add</button>
+  </div>
+
+  <div class="log">
+    <h2>Today's log</h2>
+    <ul id="log"></ul>
+  </div>
+</div>
+
+<script>
+const GOAL = 2000;
+const CIRC = 2 * Math.PI * 86; // 540.35
+
+const PRESETS = [
+  { kind: "Water",  emoji: "💧", amount: 250 },
+  { kind: "Coffee", emoji: "☕", amount: 150 },
+  { kind: "Tea",    emoji: "🍵", amount: 200 },
+  { kind: "Juice",  emoji: "🧃", amount: 200 },
+];
+
+const EMOJI = { water:"💧", coffee:"☕", tea:"🍵", juice:"🧃", soda:"🥤", beer:"🍺", wine:"🍷", milk:"🥛", smoothie:"🥤" };
+const emojiFor = (kind) => EMOJI[kind.toLowerCase()] || "🥤";
+
+// Build quick-add buttons
+const quickEl = document.getElementById("quick");
+PRESETS.forEach(p => {
+  const b = document.createElement("button");
+  b.innerHTML = `<span class="emoji">${p.emoji}</span>${p.kind}<span class="ml">${p.amount} ml</span>`;
+  b.onclick = () => addDrink(p.kind, p.amount);
+  quickEl.appendChild(b);
+});
+
+function fmtTime(iso) {
+  // stored as UTC "YYYY-MM-DD HH:MM:SS"
+  const d = new Date(iso.replace(" ", "T") + "Z");
+  return d.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" });
+}
+
+async function load() {
+  const res = await fetch("/api/drinks");
+  const data = await res.json();
+  render(data);
+}
+
+function render(data) {
+  document.getElementById("total").textContent = data.total;
+  document.getElementById("goalLabel").textContent = `of ${GOAL} ml goal`;
+
+  const pct = Math.min(data.total / GOAL, 1);
+  document.getElementById("ringFill").style.strokeDashoffset = CIRC * (1 - pct);
+
+  const log = document.getElementById("log");
+  log.innerHTML = "";
+  if (!data.drinks.length) {
+    log.innerHTML = `<div class="empty">Nothing yet — log your first drink 👆</div>`;
+    return;
+  }
+  data.drinks.forEach(d => {
+    const li = document.createElement("li");
+    li.innerHTML = `
+      <span class="li-emoji">${emojiFor(d.kind)}</span>
+      <div class="li-info">
+        <div class="li-kind">${d.kind}</div>
+        <div class="li-time">${fmtTime(d.created_at)}</div>
+      </div>
+      <span class="li-amount">${d.amount} ml</span>
+      <button class="li-del" title="Remove" aria-label="Remove">✕</button>`;
+    li.querySelector(".li-del").onclick = () => remove(d.id);
+    log.appendChild(li);
+  });
+}
+
+async function addDrink(kind, amount) {
+  await fetch("/api/drinks", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ kind, amount }),
+  });
+  load();
+}
+
+async function remove(id) {
+  await fetch("/api/drinks/" + id, { method: "DELETE" });
+  load();
+}
+
+// Custom add
+document.getElementById("addCustom").onclick = () => {
+  const name = document.getElementById("customName").value.trim();
+  const ml = parseInt(document.getElementById("customMl").value, 10);
+  if (!name || !ml || ml <= 0) return;
+  addDrink(name, ml);
+  document.getElementById("customName").value = "";
+  document.getElementById("customMl").value = "";
+};
+document.getElementById("customMl").addEventListener("keydown", e => {
+  if (e.key === "Enter") document.getElementById("addCustom").click();
+});
+
+load();
+</script>
+</body>
+</html>
