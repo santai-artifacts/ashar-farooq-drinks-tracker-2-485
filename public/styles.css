@@ -202,12 +202,12 @@ input[type="datetime-local"] { color-scheme: light; }
 .bar-wrap { width: 100%; flex: 1; display: flex; align-items: flex-end; }
 .bar {
   width: 100%; border-radius: 5px 5px 3px 3px; min-height: 3px;
-  background: linear-gradient(180deg, var(--amber), #c97f3c);
+  background: linear-gradient(180deg, var(--amber-fill), #c07f28);
   animation: grow 0.5s var(--ease) both;
   position: relative;
 }
-.bar.zero { background: #232a37; }
-.bar.today { background: linear-gradient(180deg, #ffd9a8, var(--amber)); box-shadow: 0 0 0 1px rgba(255, 217, 168, 0.35); }
+.bar.zero { background: #e7e1d6; }
+.bar.today { background: linear-gradient(180deg, #eda94a, var(--amber)); box-shadow: 0 0 0 1px rgba(173, 109, 28, 0.28); }
 @keyframes grow { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 .bar { transform-origin: bottom; }
 .bar-label { font-size: 0.62rem; color: var(--muted); letter-spacing: 0.02em; white-space: nowrap; }
