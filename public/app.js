@@ -179,12 +179,19 @@ function computeStats() {
   const todayEntry = byDay.get(dayKey(today));
 
   // Alcohol-free streak: consecutive empty days ending yesterday (or today if dry
-  // so far, which we surface without claiming the day is over).
+  // so far, which we surface without claiming the day is over). Bounded by the
+  // span since the first logged drink, so an empty log reads 0 rather than
+  // claiming a year-long streak nobody earned.
   let streak = 0;
-  for (let i = 0; i < 365; i++) {
-    const day = byDay.get(dayKey(addDays(today, -i)));
-    if (day && day.units > 0) break;
-    streak++;
+  if (state.drinks.length) {
+    const earliest = new Date(state.drinks[state.drinks.length - 1].logged_at);
+    earliest.setHours(0, 0, 0, 0);
+    const span = Math.round((today - earliest) / 86400000) + 1;
+    for (let i = 0; i < span; i++) {
+      const day = byDay.get(dayKey(addDays(today, -i)));
+      if (day && day.units > 0) break;
+      streak++;
+    }
   }
 
   const fourWeeksAgo = addDays(today, -27);

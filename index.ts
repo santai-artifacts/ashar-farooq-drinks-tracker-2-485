@@ -1,6 +1,4 @@
-import db, { derive, seedIfEmpty } from "./db";
-
-seedIfEmpty();
+import db, { derive } from "./db";
 
 const publicDir = `${import.meta.dir}/public`;
 const CATEGORIES = ["beer", "wine", "spirits", "cocktail", "seltzer", "other"];
@@ -18,6 +16,8 @@ const listDrinks = db.query(`
   LIMIT 500
 `);
 
+// Databases created before sample-data seeding was removed still carry a
+// leftover 'seeded' row; exclude it so it never reaches the client.
 const readSettings = db.query<{ key: string; value: string }, []>(
   `SELECT key, value FROM settings WHERE key <> 'seeded'`,
 );
