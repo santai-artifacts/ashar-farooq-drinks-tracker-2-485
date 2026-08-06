@@ -236,7 +236,7 @@ input[type="datetime-local"] { color-scheme: light; }
   animation: fadein 0.3s var(--ease) both;
 }
 @keyframes fadein { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
-.entry:hover { background: rgba(255, 255, 255, 0.032); }
+.entry:hover { background: rgba(27, 25, 21, 0.035); }
 .entry-emoji {
   flex: none; width: 34px; height: 34px; display: grid; place-items: center;
   background: var(--surface-2); border: 1px solid var(--line); border-radius: 9px; font-size: 1rem;
@@ -252,7 +252,7 @@ input[type="datetime-local"] { color-scheme: light; }
 }
 .entry-del svg { width: 15px; height: 15px; }
 .entry:hover .entry-del, .entry-del:focus-visible { opacity: 1; }
-.entry-del:hover { color: var(--red); background: rgba(239, 106, 106, 0.12); }
+.entry-del:hover { color: var(--red); background: rgba(194, 59, 48, 0.1); }
 
 .empty { text-align: center; padding: 2rem 1rem; color: var(--muted); }
 .empty-emoji { font-size: 1.7rem; display: block; margin-bottom: 0.4rem; }
@@ -266,12 +266,12 @@ input[type="datetime-local"] { color-scheme: light; }
 }
 .toast {
   display: flex; align-items: center; gap: 0.75rem;
-  background: #1b2230; border: 1px solid var(--line);
+  background: #fff; border: 1px solid var(--line);
   border-radius: 12px; padding: 0.65rem 0.9rem; font-size: 0.87rem;
-  box-shadow: 0 14px 34px -14px rgba(0, 0, 0, 0.95);
+  box-shadow: 0 16px 34px -16px rgba(27, 25, 21, 0.5);
   animation: toastin 0.28s var(--ease) both;
 }
-.toast.error { border-color: rgba(239, 106, 106, 0.5); }
+.toast.error { border-color: rgba(194, 59, 48, 0.45); }
 .toast span { flex: 1; }
 .toast button {
   background: transparent; border: 0; color: var(--amber);
