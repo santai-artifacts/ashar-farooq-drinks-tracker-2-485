@@ -1,0 +1,9 @@
+{
+  "name": "tally-drinks-tracker",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Tally — a drinks tracker that counts standard drinks, not guesses.",
+  "scripts": {
+    "start": "bun run index.ts"
+  }
+}

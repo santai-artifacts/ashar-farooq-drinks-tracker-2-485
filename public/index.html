@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tally — drinks tracker</title>
+<meta name="description" content="Log what you drink, see it in standard drinks, and know where you are for the week.">
+<meta name="theme-color" content="#0b0e13">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><text y='26' font-size='26'>🥃</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+<a class="skip-link" href="#main">Skip to content</a>
+
+<header class="topbar">
+  <div class="wrap topbar-inner">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M5 3h14l-1.6 5.6a6 6 0 0 1-11.8 0Z"/><path d="M12 14v6"/><path d="M8.5 20h7"/>
+        </svg>
+      </span>
+      <span class="brand-text">
+        <strong>Tally</strong>
+        <span>drinks tracker</span>
+      </span>
+    </div>
+    <button class="ghost-btn" type="button" id="settings-toggle" aria-expanded="false" aria-controls="settings-panel">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.9 4.9l2.1 2.1M17 17l2.1 2.1M19.1 4.9 17 7M7 17l-2.1 2.1"/>
+      </svg>
+      Settings
+    </button>
+  </div>
+</header>
+
+<main id="main" class="wrap">
+
+  <!-- Week gauge -->
+  <section class="panel hero" aria-labelledby="week-heading">
+    <div class="hero-ring">
+      <svg viewBox="0 0 120 120" role="img" aria-labelledby="ring-label">
+        <title id="ring-label">Progress against your weekly limit</title>
+        <circle class="ring-track" cx="60" cy="60" r="52"/>
+        <circle class="ring-value" id="ring-value" cx="60" cy="60" r="52"/>
+      </svg>
+      <div class="hero-ring-center">
+        <span class="hero-units" id="week-units">—</span>
+        <span class="hero-units-label">units</span>
+      </div>
+    </div>
+
+    <div class="hero-body">
+      <h1 id="week-heading">This week</h1>
+      <p class="hero-line" id="week-line">Loading your week…</p>
+      <div class="hero-meta">
+        <div><span class="meta-value" id="today-units">—</span><span class="meta-label">today</span></div>
+        <div><span class="meta-value" id="week-drinks">—</span><span class="meta-label">drinks logged</span></div>
+        <div><span class="meta-value" id="week-kcal">—</span><span class="meta-label">est. calories</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Settings (collapsed) -->
+  <section class="panel settings" id="settings-panel" hidden aria-label="Settings">
+    <form class="settings-form" id="settings-form">
+      <label for="weekly-limit">Weekly limit (standard drinks)</label>
+      <div class="settings-row">
+        <input type="number" id="weekly-limit" name="weekly_limit" min="0" max="200" step="1" inputmode="numeric">
+        <button class="primary-btn" type="submit">Save</button>
+      </div>
+      <p class="hint">US guidance is up to 14/week for men and 7/week for women. Set it to whatever you're actually aiming for.</p>
+    </form>
+    <div class="settings-danger">
+      <div>
+        <strong>Clear all data</strong>
+        <p class="hint">Deletes every logged drink, including the sample entries this app ships with.</p>
+      </div>
+      <button class="danger-btn" type="button" id="clear-data">Clear</button>
+    </div>
+  </section>
+
+  <div class="columns">
+    <div class="col">
+
+      <!-- Quick add -->
+      <section class="panel" aria-labelledby="quick-heading">
+        <div class="panel-head">
+          <h2 id="quick-heading">Quick add</h2>
+          <span class="panel-note">logs at the current time</span>
+        </div>
+        <div class="preset-grid" id="preset-grid"></div>
+      </section>
+
+      <!-- Custom add -->
+      <section class="panel" aria-labelledby="custom-heading">
+        <div class="panel-head">
+          <h2 id="custom-heading">Log something else</h2>
+        </div>
+        <form id="drink-form" class="drink-form">
+          <div class="field span-2">
+            <label for="f-name">What was it?</label>
+            <input type="text" id="f-name" name="name" placeholder="e.g. Paloma, house red, that IPA" maxlength="80" required>
+          </div>
+
+          <div class="field">
+            <label for="f-category">Type</label>
+            <select id="f-category" name="category">
+              <option value="beer">Beer</option>
+              <option value="wine">Wine</option>
+              <option value="spirits">Spirits</option>
+              <option value="cocktail">Cocktail</option>
+              <option value="seltzer">Seltzer / RTD</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="f-volume">Volume <span class="unit">ml</span></label>
+            <input type="number" id="f-volume" name="volume_ml" min="1" max="3000" step="1" value="355" inputmode="decimal" required>
+          </div>
+
+          <div class="field">
+            <label for="f-abv">ABV <span class="unit">%</span></label>
+            <input type="number" id="f-abv" name="abv" min="0" max="96" step="0.1" value="5" inputmode="decimal" required>
+          </div>
+
+          <div class="field">
+            <label for="f-when">When</label>
+            <input type="datetime-local" id="f-when" name="logged_at">
+          </div>
+
+          <div class="field span-2">
+            <label for="f-note">Note <span class="unit">optional</span></label>
+            <input type="text" id="f-note" name="note" placeholder="With dinner, birthday round…" maxlength="200">
+          </div>
+
+          <div class="form-footer span-2">
+            <p class="live-calc" id="live-calc" aria-live="polite">≈ 1.0 units · 150 kcal</p>
+            <button class="primary-btn" type="submit">Add drink</button>
+          </div>
+        </form>
+      </section>
+    </div>
+
+    <div class="col">
+
+      <!-- Chart -->
+      <section class="panel" aria-labelledby="chart-heading">
+        <div class="panel-head">
+          <h2 id="chart-heading">Last 14 days</h2>
+          <span class="panel-note"><span class="swatch"></span> units per day</span>
+        </div>
+        <div class="chart" id="chart" role="img" aria-label="Daily standard drinks for the last 14 days"></div>
+      </section>
+
+      <!-- Stats -->
+      <section class="stat-grid" aria-label="Summary statistics">
+        <div class="panel stat">
+          <span class="stat-value" id="stat-streak">—</span>
+          <span class="stat-label">day alcohol-free streak</span>
+        </div>
+        <div class="panel stat">
+          <span class="stat-value" id="stat-dry">—</span>
+          <span class="stat-label">dry days this week</span>
+        </div>
+        <div class="panel stat">
+          <span class="stat-value" id="stat-avg">—</span>
+          <span class="stat-label">units/week, 4-week avg</span>
+        </div>
+        <div class="panel stat">
+          <span class="stat-value" id="stat-top">—</span>
+          <span class="stat-label">most logged, 30 days</span>
+        </div>
+      </section>
+
+      <!-- History -->
+      <section class="panel" aria-labelledby="history-heading">
+        <div class="panel-head">
+          <h2 id="history-heading">History</h2>
+          <span class="panel-note" id="history-count"></span>
+        </div>
+        <div id="history"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="foot">
+    <p>Units are US standard drinks (14&nbsp;g of pure alcohol). Calories are estimates from volume, ABV and drink type — not a nutrition label.</p>
+  </footer>
+</main>
+
+<div class="toast-stack" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+<script src="/app.js"></script>
+</body>
+</html>
