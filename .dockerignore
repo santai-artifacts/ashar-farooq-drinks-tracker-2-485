@@ -1,0 +1,15 @@
+# This is a Bun app. An npm/yarn/pnpm lockfile in the build context breaks the
+# image build: Bun migrates it, counts that as a change, and CI installs run
+# with a frozen lockfile. .gitignore does not cover this — the deploy copies the
+# workspace directly, so the file still reaches Docker. Keep both lists in sync.
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+node_modules/
+data/
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.local
